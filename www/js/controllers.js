@@ -1,28 +1,36 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope) {})
+.controller('ChatsCtrl', function($scope, NinjasService, $state) {
+//nao esqueca de declarar o nome do service aqui ^
 
-.controller('ChatsCtrl', function($scope, Chats) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
+    $scope.ninjas = NinjasService.listarNinjas(); //aqui estamos chamando o metodo listarNinjas, que retorna o vetor de ninjas,
+                                                  //e salvando esse vetor na $scope.ninjas, para que possamos exibir eles no html
 
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
+    $scope.selecionarPerfil = (ninja) =>{
+        NinjasService.escolherNinja(ninja); //aqui estamos passando o objeto inteiro do ninja para que,
+                                            //la no servico, possamos armazena-lo como ninjaEscolhido
+
+        $state.go('perfil');
+    }
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
-})
+.controller('PerfilCtrl', function($scope, NinjasService, $state) {
+//nao esqueca de declarar o nome do service aqui ^
 
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
+    $scope.ninja =  NinjasService.mostrarNInja();
+
+    //NAO SE ASSUTEM COM ESSA FUNCAO AQUI!!!!!
+    $scope.$on( "$ionicView.enter", function( scopes, states ) { // essa funcao é usada pra que sempre quando voce entrar na pagina,
+        if( states.fromCache && states.stateName == 'perfil' ) { // o controller execute novamente o  codigo abaixo e atualize a $scope.ninja
+                                                    // ^ aqui entre aspas simples, voces colocam o state da pagina, no caso, essa é perfil
+
+            $scope.ninja =  NinjasService.mostrarNInja();//aqui estamos chamando o metodo mostrarNinja, que retorna o objeto ninjaEscolhido,
+                                                          //e salvando esse objeto na $scope.ninja, para que possamos exibir as informacoes dele
+            console.log($scope.ninja);
+        }
+    });
+
+    $scope.voltar = () =>{
+        $state.go('tab.chats');
+    }
 });
